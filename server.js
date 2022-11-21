@@ -3,6 +3,7 @@ require("console.table");
 require("dotenv").config();
 const mysql = require("mysql2");
 
+
 // Create DB Conection
 const db = mysql.createConnection(
     {
@@ -48,24 +49,16 @@ async function promptUser() {
 
       switch (choices) {
         case 'View All Employees':
-          db.query("SELECT employee.id as id, employee.first_name as 'First Name', employee.last_name as 'Last Name', role.title as 'Job Title', role.salary as 'Salary', department.name as 'Department', employee.manager_id as 'Manager ID' FROM employee, role, department GROUP BY employee.id ORDER BY employee.id", (err, results) => {
-            console.table("\nEmployees", results); // Display results in a table
-        });
+          viewAllEmployees();
           break;
           case 'View All Roles':
-            db.query("SELECT role.id as id, role.title as Title, role.salary as Salary, department.name as Department FROM role JOIN department on role.department_id = department.id", (err, results) => {
-              console.table("\nRoles", results); // Display results in a table
-            });
+            viewAllRoles();
             break;
           case 'View All Departments':
-            db.query("SELECT id, name as 'Department Name' FROM department", (err, results) => {
-              console.table("\nDepartments", results); // Display results in a table
-          });
+            viewAllDepartments();
             break;
           case 'View All Employees By Department': 
-            db.query("SELECT employee.first_name, employee.last_name, department.name as Department FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id", (err, results) => { 
-              console.table("\nEmployees By Department", results); // Display results in a table
-            });
+            viewEmployeesByDepartments();
             break;
           case 'Add Employee':
             //create.addEmployee();
@@ -106,3 +99,36 @@ async function promptUser() {
       }
   });
 };
+
+// ------------------- METHODS ---------------------------------------//
+
+// ------------------- VIEWS ---------------------------------------//
+const viewAllEmployees = () => {  
+  db.query("SELECT employee.id as id, employee.first_name as 'First Name', employee.last_name as 'Last Name', role.title as 'Job Title', role.salary as 'Salary', department.name as 'Department', employee.manager_id as 'Manager ID' FROM employee, role, department GROUP BY employee.id ORDER BY employee.id", (err, results) => {
+    console.table("\nEmployees", results); // Display results in a table
+  });
+  promptUser();
+}
+const viewAllRoles = () => {  
+  db.query("SELECT role.id as id, role.title as Title, role.salary as Salary, department.name as Department FROM role JOIN department on role.department_id = department.id", (err, results) => {
+    console.table("\nRoles", results); // Display results in a table
+  });
+  promptUser();
+}
+const viewAllDepartments = () => {  
+  db.query("SELECT id, name as 'Department Name' FROM department", (err, results) => {
+    console.table("\nDepartments", results); // Display results in a table
+  });
+  promptUser();
+}
+const viewEmployeesByDepartments = () => {  
+  db.query("SELECT employee.first_name, employee.last_name, department.name as Department FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id", (err, results) => { 
+    console.table("\nEmployees By Department", results); // Display results in a table
+  });
+  promptUser();
+}
+
+
+// ------------------- ADDS ---------------------------------------//
+
+// ------------------- REMOVES ---------------------------------------//
