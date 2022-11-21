@@ -19,7 +19,7 @@ const validate = require('./helpers/validate');
 setTimeout(() => {promptUser();}, 1); // wrapped in setTimeout to prevent cTable getting overwritten by the prompt
 
 // Prompt User for Choices
- promptUser = async ()  => {
+async function promptUser() {
   inquirer.prompt([
       {
         name: 'choices',
@@ -30,15 +30,15 @@ setTimeout(() => {promptUser();}, 1); // wrapped in setTimeout to prevent cTable
           'View All Roles',
           'View All Departments',
           'View All Employees By Department',
-          'View Department Budgets',
-          'Update Employee Role',
-          'Update Employee Manager',
           'Add Employee',
           'Add Role',
           'Add Department',
           'Remove Employee',
           'Remove Role',
           'Remove Department',
+          'Update Employee Role',
+          'Update Employee Manager',
+          'View Department Budgets',
           'Exit'
           ]
       }
@@ -62,15 +62,14 @@ setTimeout(() => {promptUser();}, 1); // wrapped in setTimeout to prevent cTable
               console.table("\nDepartments", results); // Display results in a table
           });
             break;
-          case 'View All Employees By Department':
-            //read.viewEmployeesByDepartment();
+          case 'View All Employees By Department': 
+            db.query("SELECT employee.first_name, employee.last_name, department.name as Department FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id", (err, results) => { 
+              console.table("\nEmployees By Department", results); // Display results in a table
+            });
             break;
           case 'Add Employee':
             //create.addEmployee();
             // viewAllEmployee after update
-            break;
-          case 'Remove Employee':
-            //removeEmployee();
             break;
           case 'Remove Employee':
             //removeEmployee();
@@ -95,9 +94,6 @@ setTimeout(() => {promptUser();}, 1); // wrapped in setTimeout to prevent cTable
             break;
           case 'View Department Budgets':
            // read.viewDepartmentBudget();
-            break;
-          case 'Remove Department':
-            //removeDepartment();
             break;
           case 'Remove Department':
             //removeDepartment();
