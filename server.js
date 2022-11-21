@@ -53,6 +53,11 @@ setTimeout(() => {promptUser();}, 1); // wrapped in setTimeout to prevent cTable
             console.table("\nEmployees", results); // Display results in a table
         });
           break;
+          case 'View All Roles':
+            db.query("SELECT role.id as id, role.title as Title, role.salary as Salary, department.name as Department FROM role JOIN department on role.department_id = department.id", (err, results) => {
+              console.table("\nRoles", results); // Display results in a table
+            });
+            break;
           case 'View All Departments':
             //read.viewAllDepartments();
             break;
@@ -75,9 +80,6 @@ setTimeout(() => {promptUser();}, 1); // wrapped in setTimeout to prevent cTable
             break;
           case 'Update Employee Manager':
             //updateEmployeeManager();
-            break;
-          case 'View All Roles':
-            //read.viewAllRoles();
             break;
           case 'Add Role':
             //create.addRole();
