@@ -3,7 +3,6 @@ require("console.table");
 require("dotenv").config();
 const mysql = require("mysql2");
 
-
 // Create DB Conection
 const db = mysql.createConnection(
     {
@@ -39,7 +38,7 @@ async function promptUser() {
           // 'Remove Department',
           'Update Employee Role',
           // 'Update Employee Manager',
-           'View Department Budgets',
+          'View Department Budgets',
           'Exit'
           ]
       }
@@ -60,37 +59,39 @@ async function promptUser() {
         case 'View All Employees By Department': 
           viewEmployeesByDepartments();
           break;
-        case 'Add Employee':
+        case 'Add Employee': {
+          // Add new Employee
           addEmployee();
-          //viewAllEmployees();
           break;
-        case 'Remove Employee':
-          //removeEmployee();
-          break;
+        }
+        // case 'Remove Employee':
+        //   removeEmployee();
+        //   break;
         case 'Update Employee Role':
           updateEmployeeRole();
-          //viewAll
           break;
-        case 'Update Employee Manager':
-          //updateEmployeeManager();
-          break;
+        // case 'Update Employee Manager':
+        //   updateEmployeeManager();
+        //   break;
         case 'Add Role':
-          addRole();
-          // viewAllRoles after update
-          break;
-        case 'Remove Role':
-          //removeRole();
-          break;
+          {
+            addRole();
+            break;
+          }
+        // case 'Remove Role':
+        //   removeRole();
+        //   break;
         case 'Add Department':
-          addDept();
-          // viewAllDepartment after update
-          break;
+          {
+            addDept();
+            break;
+          }
         case 'View Department Budgets':
           viewDepartmentBudget();
           break;
-        case 'Remove Department':
+        //case 'Remove Department':
           //removeDepartment();
-          break;
+          //break;
         case 'Exit':
           process.exit(0);
         default:
@@ -100,36 +101,47 @@ async function promptUser() {
 };
 
 // Arrays to hold all names/titles in each table to display as prompts
-let deptList = [];
-db.query("SELECT department.name as Department FROM department", (err, results) => {
-  results.forEach((dept) => {
-    deptList.push(dept.Department);
-  });
-});
-let rolesList = [];
-db.query("SELECT role.title as Title FROM role", (err, results) => {
-  results.forEach((role) => {
-    rolesList.push(role.Title);
-  });
-});
+// Scope issues when using them as methods?
 
-let employeeNames =[];
-db.query("SELECT CONCAT(first_name, ' ', last_name) as Name FROM employee", (err, results) => {
-  results.forEach((employee) => {
-    employeeNames.push(employee.Name);
+var deptList = [];
+var rolesList = [];
+var employeeNames = [];
+
+const getDepartments = async () => {
+  db.query("SELECT department.name as Department FROM department", (err, results) => {
+    results.forEach((dept) => {
+      deptList.push(dept.Department);
+    });
   });
-});
+}
+const getRoles = async () => {
+  db.query("SELECT role.title as Title FROM role", (err, results) => {
+    results.forEach((role) => {
+      rolesList.push(role.Title);
+    });
+  });
+}
+const getEmployees =  async () => {
+  db.query("SELECT CONCAT(first_name, ' ', last_name) as Name FROM employee", (err, results) => {
+    results.forEach((employee) => {
+      employeeNames.push(employee.Name);
+    });
+  });
+}
+
+
+
 
 // ------------------- METHODS ---------------------------------------//
 // ------------------- VIEWS ---------------------------------------//
 const viewAllEmployees = () => {  
-  db.query("SELECT employee.id as id, employee.first_name as 'First Name', employee.last_name as 'Last Name', role.title as 'Job Title', role.salary as 'Salary', department.name as 'Department', employee.manager_id as 'Manager ID' FROM employee, role, department GROUP BY employee.id ORDER BY employee.id", (err, results) => {
+  db.query("SELECT employee.id as id, employee.first_name as 'First Name', employee.last_name as 'Last Name', title as 'Title', salary as Salary, name as Department, CONCAT(e.first_name, ' ', e.last_name) as Manager FROM employee JOIN role r on employee.role_id = r.id JOIN department d on d.id = r.department_id LEFT JOIN employee e on employee.manager_id = e.id", (err, results) => {
     console.table("\nEmployees", results); // Display results in a table
   });
   promptUser();
 }
 const viewAllRoles = () => {  
-  db.query("SELECT role.id as id, role.title as Title, role.salary as Salary, department.name as Department FROM role JOIN department on role.department_id = department.id", (err, results) => {
+  db.query("SELECT role.id AS id, role.title as Title, role.salary as Salary, department.name as Department FROM role JOIN department on role.department_id = department.id", (err, results) => {
     console.table("\nRoles", results); // Display results in a table
   });
   promptUser();
@@ -158,6 +170,9 @@ const viewDepartmentBudget = () => {
 // ------------------- ADDS ---------------------------------------//
 
 const addEmployee = async () => {
+  await getEmployees();
+  await getRoles();
+
   await inquirer.prompt([
     {
       type: 'input',
@@ -189,10 +204,23 @@ const addEmployee = async () => {
       err ? console.error(err) : true; // Log any errors
     });
   });
+
+  // Update employee names list
+  // let employeeNames =[];
+  // db.query("SELECT CONCAT(first_name, ' ', last_name) as Name FROM employee", (err, results) => {
+  //   results.forEach((employee) => {
+  //     employeeNames.push(employee.Name);
+  //   });
+  // });
+
+  // Query user again
   promptUser();
 }
 
 const addRole = async () => {
+
+  await getDepartments();
+
   await inquirer.prompt([
     {
       name: "title",
@@ -218,6 +246,9 @@ const addRole = async () => {
       err ? console.error(err) : true; // Log any errors
     });
   });
+  
+  await getRoles();
+
   promptUser();
 }
 
@@ -235,6 +266,10 @@ const addDept = async () => {
       err ? console.error(err) : true; // Log any errors
     });
   });
+
+  // update dept list
+  await getDepartments();
+
   promptUser();
 }
 
@@ -259,6 +294,7 @@ const updateEmployeeRole = async () => {
       err ? console.error(err) : true; // Log any errors
     });
   });
+
   promptUser();
 }
 // ------------------- REMOVES ---------------------------------------//

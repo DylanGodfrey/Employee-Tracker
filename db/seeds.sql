@@ -9,9 +9,8 @@ VALUES ('Johnnie', 'Random', 1, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ('James', 'Smith', 1, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ('Ronnie', 'Manning', 1, null);
+VALUES ('Ronnie', 'Manning', 3, null);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ('Jimmy', 'Jones', 2, 2);
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ('Larry', 'Legal', 4, null);
-
+VALUES ('Larry', 'Legal', 4, 3);
