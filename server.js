@@ -17,6 +17,7 @@ const db = mysql.createConnection(
 // Import helper files - validate inputs
 const validate = require('./helpers/validate');
 
+
 setTimeout(() => {promptUser();}, 1); // wrapped in setTimeout to prevent cTable getting overwritten by the prompt
 
 // Prompt User for Choices
@@ -51,51 +52,52 @@ async function promptUser() {
         case 'View All Employees':
           viewAllEmployees();
           break;
-          case 'View All Roles':
-            viewAllRoles();
-            break;
-          case 'View All Departments':
-            viewAllDepartments();
-            break;
-          case 'View All Employees By Department': 
-            viewEmployeesByDepartments();
-            break;
-          case 'Add Employee':
-            //create.addEmployee();
-            // viewAllEmployee after update
-            break;
-          case 'Remove Employee':
-            //removeEmployee();
-            break;
-          case 'Update Employee Role':
-            //update.updateEmployeeRole();
-            //viewAll
-            break;
-          case 'Update Employee Manager':
-            //updateEmployeeManager();
-            break;
-          case 'Add Role':
-            //create.addRole();
-            // viewAllRoles after update
-            break;
-          case 'Remove Role':
-            //removeRole();
-            break;
-          case 'Add Department':
-            //create.addDepartment();
-            // viewAllDepartment after update
-            break;
-          case 'View Department Budgets':
-           // read.viewDepartmentBudget();
-            break;
-          case 'Remove Department':
-            //removeDepartment();
-            break;
-          case 'Exit':
-            //exit
-            break;
-          default:
-            break;
+        case 'View All Roles':
+          viewAllRoles();
+          break;
+        case 'View All Departments':
+          viewAllDepartments();
+          break;
+        case 'View All Employees By Department': 
+          viewEmployeesByDepartments();
+          break;
+        case 'Add Employee': {
+          addEmployee();
+          //viewAllEmployees();
+          break;
+        }
+        case 'Remove Employee':
+          //removeEmployee();
+          break;
+        case 'Update Employee Role':
+          //update.updateEmployeeRole();
+          //viewAll
+          break;
+        case 'Update Employee Manager':
+          //updateEmployeeManager();
+          break;
+        case 'Add Role':
+          //create.addRole();
+          // viewAllRoles after update
+          break;
+        case 'Remove Role':
+          //removeRole();
+          break;
+        case 'Add Department':
+          //create.addDepartment();
+          // viewAllDepartment after update
+          break;
+        case 'View Department Budgets':
+          // read.viewDepartmentBudget();
+          break;
+        case 'Remove Department':
+          //removeDepartment();
+          break;
+        case 'Exit':
+          //exit
+          break;
+        default:
+          break;
       }
   });
 };
@@ -130,5 +132,54 @@ const viewEmployeesByDepartments = () => {
 
 
 // ------------------- ADDS ---------------------------------------//
+
+const addEmployee = async () => {
+
+  let rolesList = [];
+  db.query("SELECT role.id as id, role.title as Title, role.salary as Salary, department.name as Department FROM role JOIN department on role.department_id = department.id", (err, results) => {
+    results.forEach((role) => {
+      rolesList.push(role.Title);
+    });
+  });
+
+  let managersNames =[];
+  db.query("SELECT id, CONCAT(first_name, ' ', last_name) as Name FROM employee", (err, results) => {
+    results.forEach((manager) => {
+      managersNames.push(manager.Name);
+    });
+  });
+
+  await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'firstName',
+      message: "What is the employee's first name?",
+      //validate: addFirstName => {(addFirstName) ? true : false;}
+    },
+    {
+      type: 'input',
+      name: 'lastName',
+      message: "What is the employee's last name?",
+      //validate: addLastName => {(addLastName) ? true : false;}
+    },
+    {
+      type: 'list',
+      name: 'role',
+      message: "What is the employee's role?",
+      choices: rolesList
+    },
+    {
+      type: 'list',
+      name: 'manager',
+      message: "Who is the employee's manager?",
+      choices: managersNames
+    }
+  ])
+  .then((answer) => {
+    db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.firstName, answer.lastName, (answer.role.indexOf(answer.role)+1), (answer.manager.indexOf(answer.manager)+1)], (err) => {
+      err ? console.error(err) : true; // Log any errors
+  });
+  });
+}
 
 // ------------------- REMOVES ---------------------------------------//
