@@ -92,15 +92,13 @@ async function promptUser() {
           //removeDepartment();
           break;
         case 'Exit':
-          //exit
-          break;
+          process.exit(0);
         default:
           break;
       }
   });
 };
 
-// ------------------- METHODS ---------------------------------------//
 // Arrays to hold all names/titles in each table to display as prompts
 let deptList = [];
 db.query("SELECT department.name as Department FROM department", (err, results) => {
@@ -121,6 +119,8 @@ db.query("SELECT CONCAT(first_name, ' ', last_name) as Name FROM employee", (err
     employeeNames.push(employee.Name);
   });
 });
+
+// ------------------- METHODS ---------------------------------------//
 // ------------------- VIEWS ---------------------------------------//
 const viewAllEmployees = () => {  
   db.query("SELECT employee.id as id, employee.first_name as 'First Name', employee.last_name as 'Last Name', role.title as 'Job Title', role.salary as 'Salary', department.name as 'Department', employee.manager_id as 'Manager ID' FROM employee, role, department GROUP BY employee.id ORDER BY employee.id", (err, results) => {
@@ -187,8 +187,9 @@ const addEmployee = async () => {
   .then((answer) => {
     db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.firstName, answer.lastName, (rolesList.indexOf(answer.role)+1), (employeeNames.indexOf(answer.manager)+1)], (err) => {
       err ? console.error(err) : true; // Log any errors
+    });
   });
-  });
+  promptUser();
 }
 
 const addRole = async () => {
@@ -215,8 +216,9 @@ const addRole = async () => {
   .then((answer) => {
     db.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [answer.title, answer.salary, (deptList.indexOf(answer.dept)+1)], (err) => {
       err ? console.error(err) : true; // Log any errors
+    });
   });
-  });
+  promptUser();
 }
 
 const addDept = async () => {
@@ -233,6 +235,7 @@ const addDept = async () => {
       err ? console.error(err) : true; // Log any errors
     });
   });
+  promptUser();
 }
 
 // ------------------- UPDATES ---------------------------------------//
@@ -256,6 +259,6 @@ const updateEmployeeRole = async () => {
       err ? console.error(err) : true; // Log any errors
     });
   });
-
+  promptUser();
 }
 // ------------------- REMOVES ---------------------------------------//
