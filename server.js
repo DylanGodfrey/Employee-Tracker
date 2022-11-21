@@ -48,18 +48,17 @@ setTimeout(() => {promptUser();}, 1); // wrapped in setTimeout to prevent cTable
 
       switch (choices) {
         case 'View All Employees':
-          //read.viewAllEmployees();
-          db.query("SELECT employee.id as id, employee.first_name as 'First Name', employee.last_name as 'Last Name', role.title as 'Job Title', role.salary as 'Salary', department.department_name as 'Department', employee.manager_id as 'Manager ID' FROM employee, role, department GROUP BY employee.id ORDER BY employee.id", (err, results) => {
+          db.query("SELECT employee.id as id, employee.first_name as 'First Name', employee.last_name as 'Last Name', role.title as 'Job Title', role.salary as 'Salary', department.name as 'Department', employee.manager_id as 'Manager ID' FROM employee, role, department GROUP BY employee.id ORDER BY employee.id", (err, results) => {
             console.table("\nEmployees", results); // Display results in a table
         });
           break;
           case 'View All Roles':
-            db.query("SELECT role.id as id, role.title as Title, role.salary as Salary, department.department_name as Department FROM role JOIN department on role.department_id = department.id", (err, results) => {
+            db.query("SELECT role.id as id, role.title as Title, role.salary as Salary, department.name as Department FROM role JOIN department on role.department_id = department.id", (err, results) => {
               console.table("\nRoles", results); // Display results in a table
             });
             break;
           case 'View All Departments':
-            db.query("SELECT id, department_name as 'Department Name' FROM department", (err, results) => {
+            db.query("SELECT id, name as 'Department Name' FROM department", (err, results) => {
               console.table("\nDepartments", results); // Display results in a table
           });
             break;
