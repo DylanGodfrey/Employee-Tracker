@@ -54,12 +54,14 @@ setTimeout(() => {promptUser();}, 1); // wrapped in setTimeout to prevent cTable
         });
           break;
           case 'View All Roles':
-            db.query("SELECT role.id as id, role.title as Title, role.salary as Salary, department.name as Department FROM role JOIN department on role.department_id = department.id", (err, results) => {
+            db.query("SELECT role.id as id, role.title as Title, role.salary as Salary, department.department_name as Department FROM role JOIN department on role.department_id = department.id", (err, results) => {
               console.table("\nRoles", results); // Display results in a table
             });
             break;
           case 'View All Departments':
-            //read.viewAllDepartments();
+            db.query("SELECT id, department_name as 'Department Name' FROM department", (err, results) => {
+              console.table("\nDepartments", results); // Display results in a table
+          });
             break;
           case 'View All Employees By Department':
             //read.viewEmployeesByDepartment();

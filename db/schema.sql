@@ -5,7 +5,7 @@ USE employees;
 
 CREATE TABLE department (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(30) NOT NULL
+    department_name VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE role (
@@ -18,8 +18,8 @@ CREATE TABLE role (
 
 CREATE TABLE employee(
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
-    first_name VARCHAR(30) NOT NULL DEFAULT '',
-    last_name VARCHAR(30) NOT NULL DEFAULT '',
+    first_name VARCHAR(30) NOT NULL,
+    last_name VARCHAR(30) NOT NULL,
     role_id INTEGER,
     manager_id INTEGER,
     FOREIGN KEY (role_id) REFERENCES role(id),
