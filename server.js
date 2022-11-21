@@ -77,7 +77,7 @@ async function promptUser() {
           //updateEmployeeManager();
           break;
         case 'Add Role':
-          //create.addRole();
+          addRole();
           // viewAllRoles after update
           break;
         case 'Remove Role':
@@ -134,16 +134,15 @@ const viewEmployeesByDepartments = () => {
 // ------------------- ADDS ---------------------------------------//
 
 const addEmployee = async () => {
-
   let rolesList = [];
-  db.query("SELECT role.id as id, role.title as Title, role.salary as Salary, department.name as Department FROM role JOIN department on role.department_id = department.id", (err, results) => {
+  db.query("SELECT role.title as Title FROM role", (err, results) => {
     results.forEach((role) => {
       rolesList.push(role.Title);
     });
   });
 
   let managersNames =[];
-  db.query("SELECT id, CONCAT(first_name, ' ', last_name) as Name FROM employee", (err, results) => {
+  db.query("SELECT CONCAT(first_name, ' ', last_name) as Name FROM employee", (err, results) => {
     results.forEach((manager) => {
       managersNames.push(manager.Name);
     });
@@ -177,6 +176,43 @@ const addEmployee = async () => {
   ])
   .then((answer) => {
     db.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.firstName, answer.lastName, (answer.role.indexOf(answer.role)+1), (answer.manager.indexOf(answer.manager)+1)], (err) => {
+      err ? console.error(err) : true; // Log any errors
+  });
+  });
+}
+
+
+
+const addRole = async () => {
+  let deptList = [];
+  db.query("SELECT department.name as Department FROM department", (err, results) => {
+    results.forEach((dept) => {
+      deptList.push(dept.Department);
+    });
+  });
+
+  await inquirer.prompt([
+    {
+      name: "title",
+      type: "input",
+      message: "What is the name of your new role?",
+      //validate: validate.validateString,
+    },
+    {
+      name: "dept",
+      type: "list",
+      message: "Which department is this new role in?",
+      choices: deptList,
+    },
+    {
+      name: "salary",
+      type: "input",
+      message: "What is the salary of this new role?",
+      //validate: validate.validateSalary,
+    }
+  ])
+  .then((answer) => {
+    db.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [answer.title, answer.salary, (answer.dept.indexOf(answer.dept)+1)], (err) => {
       err ? console.error(err) : true; // Log any errors
   });
   });
